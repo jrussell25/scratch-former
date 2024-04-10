@@ -52,15 +52,18 @@ class MHSA(torch.nn.Module):
 
 
 class PositionalEncoding(torch.nn.Module):
-    def __init__(self, L: int, d_model: int):
+    def __init__(self, d_model: int, Lmax: int = 1000):
         super().__init__()
         assert d_model % 2 == 0, "d_model must be even"
-        pos = torch.arange(L)[..., None]
-        w = torch.tensor(1e-5).pow(2 * torch.arange(d_model // 2) / d_model)
+        pos = torch.arange(Lmax).unsqueeze(1)
+        log_w0 = torch.log(torch.tensor(1e-5))
+        w = torch.exp(torch.arange(0, d_model, 2) * log_w0)
 
-        s = torch.sin(w * pos)
-        c = torch.cos(w * pos)
+        self.pe = torch.nn.Parameter(
+            data=torch.zeros((1, Lmax, d_model)), requires_grad=False
+        )
+        self.pe.data[..., ::2] = torch.sin(w * pos)
+        self.pe.data[..., 1::2] = torch.cos(w * pos)
 
-        out = torch.stack([s, c], dim=-1).flatten()
-
-        return out
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        return x + self.pe[:, : x.shape[1]]
