@@ -1,10 +1,5 @@
 import torch
 
-__all__ = [
-    "ResidualFF",
-    "MHSA",
-]
-
 
 class ResidualFF(torch.nn.Module):
     def __init__(self, d_model: int, d_ff: int):
@@ -30,10 +25,10 @@ class MHSA(torch.nn.Module):
         self.d_head = d_model // n_heads
         self.scale = 1.0 / torch.sqrt(torch.tensor(self.d_head, dtype=torch.float32))
 
-        self.Wq = torch.nn.Parameter(d_model, d_model)
-        self.Wk = torch.nn.Parameter(d_model, d_model)
-        self.Wv = torch.nn.Parameter(d_model, d_model)
-        self.Wout = torch.nn.Parameter(d_model, d_model)
+        self.proj_q = torch.nn.Linear(d_model, d_model, bias=False)
+        self.proj_k = torch.nn.Linear(d_model, d_model, bias=False)
+        self.proj_v = torch.nn.Linear(d_model, d_model, bias=False)
+        self.proj_out = torch.nn.Linear(d_model, d_model, bias=False)
 
     def forward(
         self, x: torch.Tensor, mask: torch.Tensor
@@ -41,9 +36,9 @@ class MHSA(torch.nn.Module):
         # each is N x L x H x A
         # think about the translation or non-self attention case
         # Lq does not necessarily need to be the same a Lk
-        q = torch.matmul(x, self.Wq).reshape((x.shape[:2], self.n_heads, self.d_head))
-        k = torch.matmul(x, self.Wk).reshape((x.shape[:2], self.n_heads, self.d_head))
-        v = torch.matmul(x, self.Wv).reshape((x.shape[:2], self.n_heads, self.d_head))
+        q = self.proj_q(x).reshape((*x.shape[:2], self.n_heads, self.d_head))
+        k = self.proj_k(x).reshape((*x.shape[:2], self.n_heads, self.d_head))
+        v = self.proj_v(x).reshape((*x.shape[:2], self.n_heads, self.d_head))
 
         # Attn map is N x L x H
         attn = torch.einsum("nqhd,nkhd->nqkh", q, k)
@@ -52,6 +47,20 @@ class MHSA(torch.nn.Module):
         z = torch.einsum("nqkh,nkhd->nqhd", attn, v).reshape(
             (*x.shape[:2], self.d_model)
         )
-        z = torch.einsum("nqd,de->nqe", z, self.Wout)
-
+        z = self.proj_out(z)
         return x + z
+
+
+class PositionalEncoding(torch.nn.Module):
+    def __init__(self, L: int, d_model: int):
+        super().__init__()
+        assert d_model % 2 == 0, "d_model must be even"
+        pos = torch.arange(L)[..., None]
+        w = torch.tensor(1e-5).pow(2 * torch.arange(d_model // 2) / d_model)
+
+        s = torch.sin(w * pos)
+        c = torch.cos(w * pos)
+
+        out = torch.stack([s, c], dim=-1).flatten()
+
+        return out
