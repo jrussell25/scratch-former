@@ -1,7 +1,7 @@
 import torch
 
 
-class ResidualFF(torch.nn.Module):
+class ResidualFFN(torch.nn.Module):
     def __init__(self, d_model: int, d_ff: int):
         super().__init__()
         self.linear1 = torch.nn.Linear(d_model, d_ff)
@@ -10,8 +10,8 @@ class ResidualFF(torch.nn.Module):
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         z = self.linear1(x)
-        z = self.relu(x)
-        z = self.linear2(x)
+        z = self.relu(z)
+        z = self.linear2(z)
         return x + z
 
 
@@ -31,7 +31,7 @@ class MHSA(torch.nn.Module):
         self.proj_out = torch.nn.Linear(d_model, d_model, bias=False)
 
     def forward(
-        self, x: torch.Tensor, mask: torch.Tensor
+        self, x: torch.Tensor, mask_inds: torch.Tensor | None
     ) -> torch.Tensor:  # x should be N x L x d_model
         # each is N x L x H x A
         # think about the translation or non-self attention case
@@ -40,8 +40,10 @@ class MHSA(torch.nn.Module):
         k = self.proj_k(x).reshape((*x.shape[:2], self.n_heads, self.d_head))
         v = self.proj_v(x).reshape((*x.shape[:2], self.n_heads, self.d_head))
 
-        # Attn map is N x L x H
+        # Attn map is N x Lq x Lk x H
         attn = torch.einsum("nqhd,nkhd->nqkh", q, k)
+        if mask_inds is not None:
+            attn[:, mask_inds[0], mask_inds[1]] = -1e9
         attn = torch.softmax(attn * self.scale, dim=-2)
 
         z = torch.einsum("nqkh,nkhd->nqhd", attn, v).reshape(
