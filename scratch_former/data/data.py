@@ -3,7 +3,7 @@ import torch
 
 
 def get_batch_tokens(
-    token_arr: np.ndarray, batch_size: int, context_length: int
+    token_arr: np.ndarray, batch_size: int, context_length: int, device: str
 ) -> tuple[torch.Tensor, torch.Tensor]:
     starts = np.random.randint(len(token_arr) - batch_size - 1, size=(batch_size,))
     tokens = torch.zeros((batch_size, context_length + 1), dtype=torch.long)
@@ -11,4 +11,6 @@ def get_batch_tokens(
         tokens[i] = torch.tensor(
             token_arr[idx : idx + context_length + 1], dtype=torch.float
         )
+
+    tokens = tokens.to(device)
     return tokens[:, :-1], tokens[:, 1:]
