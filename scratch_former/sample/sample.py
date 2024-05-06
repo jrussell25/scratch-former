@@ -40,3 +40,57 @@ def predict_beam(
         return seq[:, -n_gen:], total_log_prob
     else:
         return seq[total_log_prob.argmax(), -n_gen:]
+
+
+def sample_topk(
+    model: Transformer,
+    seed_seq: int,
+    n_gen: int,
+    k: int,
+    temperature: float = 1.0,
+    batch_size: int = 1,
+) -> torch.Tensor:
+    seq = torch.atleast_2d(seed_seq)
+    seq = seq.expand((batch_size, seq.shape[1]))
+    ctx_mask = torch.triu_indices(seq.shape[1], seq.shape[1], 1)
+    for i in range(n_gen):
+        with torch.no_grad():
+            x = model(seq, mask_inds=ctx_mask)
+        next_token = torch.zeros((batch_size), dtype=torch.int)
+        top = torch.topk(x[:, -1], k)
+        probs = torch.softmax(top.values / temperature, dim=-1)
+        next_token = top.indices[
+            torch.arange(batch_size), torch.multinomial(probs, num_samples=1).squeeze()
+        ]
+        seq = torch.cat((seq[:, 1:], next_token[:, None]), dim=1)
+    return seq[:, -n_gen:]
+
+
+def sample_nucleus(
+    model: Transformer,
+    seed_seq: torch.Tensor,
+    n_pred: int,
+    p: float = 0.95,
+    batch_size: int = 1,
+) -> torch.Tensor:
+    seq = torch.atleast_2d(seed_seq)
+    seq = seq.expand((batch_size, seq.shape[1]))
+    ctx_mask = torch.triu_indices(seq.shape[1], seq.shape[1], 1)
+    for i in range(n_pred):
+        with torch.no_grad():
+            x = model(seq, mask_inds=ctx_mask)
+        probs = torch.softmax(x[:, -1], dim=-1)
+        p_sorted, inds = torch.sort(probs, descending=True)
+        keep = torch.cumsum(p_sorted, dim=-1) < p
+        next_token = torch.zeros((batch_size), dtype=torch.int)
+        for b in range(
+            batch_size
+        ):  # has to be a loop because of variable sizes for each batch
+            probs_nuc = p_sorted[b, keep[b]]
+            probs_nuc /= probs_nuc.sum()
+            if probs_nuc.shape[0] == 0:
+                next_token[b] = inds[b][0]
+            else:
+                next_token[b] = inds[b][torch.multinomial(probs_nuc, num_samples=1)]
+        seq = torch.cat((seq[:, 1:], next_token[:, None]), dim=1)
+    return seq[:, -n_pred:]
