@@ -1,0 +1,59 @@
+Greedy Sampling -- 1 seq x 64 tokens -- 5.448 tokens/second
+Seed:  = Brad Stevens =
+ Bradley Kent " Brad " Stevens ( born October 22 , 1976 ) is an American professional basketball head coach for the Boston Celtics of the NBA . He was previously the head coach at Butler University in Indianapolis . A former basketball player , he grew up in Zionsville , Indiana , where he starred on the Zionsville Community High School basketball team , setting four school records . After high school , he attended DePauw University , where he played basketball and earned a degree in economics . He made the all @-@ conference team multiple times and was a three @-@ time Academic All @-@ America nominee .
+ Stevens joined the Butler basketball program as a volunteer prior to the 2000 – 01 season after quitting his job at Eli Lilly and Company . He was promoted to a full @-@ time assistant coaching position for the 2001 – 02 season . On April 4 , 2007 , he became the head coach after Todd Lickliter left to coach the Iowa Hawkeyes . In his first year , Stevens led Butler to 30 wins , becoming the third @-@ youngest head coach in NCAA Division I history to have a 30 @-@ win season .
+ In 2010
+Response:  , he was named to the All @-@ Star Team , where he was named to the All @-@ Star Team .
+ = = Early life = =
+ Stevens was born on April 28 , 1987 in the village of St. Louis , Missouri , to a young boy , and his wife ,
+
+Beam Sampling (BEAM=10)-- 1 seq x 64 tokens -- 0.637 tokens/second
+Seed:  = Brad Stevens =
+ Bradley Kent " Brad " Stevens ( born October 22 , 1976 ) is an American professional basketball head coach for the Boston Celtics of the NBA . He was previously the head coach at Butler University in Indianapolis . A former basketball player , he grew up in Zionsville , Indiana , where he starred on the Zionsville Community High School basketball team , setting four school records . After high school , he attended DePauw University , where he played basketball and earned a degree in economics . He made the all @-@ conference team multiple times and was a three @-@ time Academic All @-@ America nominee .
+ Stevens joined the Butler basketball program as a volunteer prior to the 2000 – 01 season after quitting his job at Eli Lilly and Company . He was promoted to a full @-@ time assistant coaching position for the 2001 – 02 season . On April 4 , 2007 , he became the head coach after Todd Lickliter left to coach the Iowa Hawkeyes . In his first year , Stevens led Butler to 30 wins , becoming the third @-@ youngest head coach in NCAA Division I history to have a 30 @-@ win season .
+ In 2010
+Response:  and 2012 , he was named the 2012 NCAA Men 's Basketball Tournament Most Valuable Player of the Year .
+ = = Early career = =
+ = = = Early years ( 2012 – 13 ) = = =
+ Stevens attended the University of Michigan in 2012 , where he
+
+Top K Sampling (K=128)-- 3 seq x 64 tokens -- 6.793 tokens/second
+Seed:  = Brad Stevens =
+ Bradley Kent " Brad " Stevens ( born October 22 , 1976 ) is an American professional basketball head coach for the Boston Celtics of the NBA . He was previously the head coach at Butler University in Indianapolis . A former basketball player , he grew up in Zionsville , Indiana , where he starred on the Zionsville Community High School basketball team , setting four school records . After high school , he attended DePauw University , where he played basketball and earned a degree in economics . He made the all @-@ conference team multiple times and was a three @-@ time Academic All @-@ America nominee .
+ Stevens joined the Butler basketball program as a volunteer prior to the 2000 – 01 season after quitting his job at Eli Lilly and Company . He was promoted to a full @-@ time assistant coaching position for the 2001 – 02 season . On April 4 , 2007 , he became the head coach after Todd Lickliter left to coach the Iowa Hawkeyes . In his first year , Stevens led Butler to 30 wins , becoming the third @-@ youngest head coach in NCAA Division I history to have a 30 @-@ win season .
+ In 2010
+Response 0:  , Bradley was a Class 15A NBA All @-@ American select All @-@ Pro selection — the Young Player , and the Johnson brothers of the Class @-@ Gator Cup . He was the # 6 pick and 9th overall defensive selection .
+ = = = College career = = =
+Response 1:  , Bradley transferred to Syracuse University , where he transferred Tom 's head coach to Northwestern University .
+ = = In basketball = =
+ Stevens worked at Eindhoven before returning to Northwestern to begin an investigation with the incident . After graduating from high school senior Kevin Sisler , the following year , but eventually leading his team
+Response 2:  , Burke was named in the 2010 All @-@ Conference Team , where he was named to the All @-@ Conference team All Five First Team recognition .
+ = = Early years = =
+ = = = Early years ( 2011 – 2012 ) = = =
+ Stevens was born in
+
+Top K Sampling (K=128 T_LOW=0.7)-- 3 seq x 64 tokens -- 5.556 tokens/second
+Seed:  = Brad Stevens =
+ Bradley Kent " Brad " Stevens ( born October 22 , 1976 ) is an American professional basketball head coach for the Boston Celtics of the NBA . He was previously the head coach at Butler University in Indianapolis . A former basketball player , he grew up in Zionsville , Indiana , where he starred on the Zionsville Community High School basketball team , setting four school records . After high school , he attended DePauw University , where he played basketball and earned a degree in economics . He made the all @-@ conference team multiple times and was a three @-@ time Academic All @-@ America nominee .
+ Stevens joined the Butler basketball program as a volunteer prior to the 2000 – 01 season after quitting his job at Eli Lilly and Company . He was promoted to a full @-@ time assistant coaching position for the 2001 – 02 season . On April 4 , 2007 , he became the head coach after Todd Lickliter left to coach the Iowa Hawkeyes . In his first year , Stevens led Butler to 30 wins , becoming the third @-@ youngest head coach in NCAA Division I history to have a 30 @-@ win season .
+ In 2010
+Response 0:  , Stevens was named the starting quarterback and co @-@ captains for the 2008 – 09 season , making 12 appearances in the 2009 – 10 season . The team won the 2009 National Invitation Tournament with 14 wins .
+ = = Professional career = =
+ = = = U
+Response 1:  , Bradley served as head coach of the Chicago Bears . He has a son and son , and is a retired head coach .
+ = = Early life and career = =
+ Bradley was born on July 21 , 1967 to a young teacher who worked in the fields of the local community . His father , a
+Response 2:  , Stevens posted 32 points in 4 @-@ 2 .
+ = = Early life and career = =
+ Burke was born in Washington , D.C. , New York , to John McCain and his wife , Sarah . Burke was the son of former President of the United States , and his wife , Natalie
+
+Nucleus Sampling (P_NUC=0.95) -- 3 seq x 64 tokens -- 6.403 tokens/second
+Seed:  = Brad Stevens =
+ Bradley Kent " Brad " Stevens ( born October 22 , 1976 ) is an American professional basketball head coach for the Boston Celtics of the NBA . He was previously the head coach at Butler University in Indianapolis . A former basketball player , he grew up in Zionsville , Indiana , where he starred on the Zionsville Community High School basketball team , setting four school records . After high school , he attended DePauw University , where he played basketball and earned a degree in economics . He made the all @-@ conference team multiple times and was a three @-@ time Academic All @-@ America nominee .
+ Stevens joined the Butler basketball program as a volunteer prior to the 2000 – 01 season after quitting his job at Eli Lilly and Company . He was promoted to a full @-@ time assistant coaching position for the 2001 – 02 season . On April 4 , 2007 , he became the head coach after Todd Lickliter left to coach the Iowa Hawkeyes . In his first year , Stevens led Butler to 30 wins , becoming the third @-@ youngest head coach in NCAA Division I history to have a 30 @-@ win season .
+ In 2010
+Response 0:  , he appeared at M @-@ 0 in the NCAA Division I Basketball Tournament in Bangkok , where he graduated from the high school .
+ On September 5 , ída impecc Jack Brui , after his playing season against the Bob under @-@ /{{ leaked'Connor Amounts they married the teenager_RAD of
+Response 1:  , Stevens became vice @-@ junior Miss Special TeamsVery of Illinois Under The Basketball and the Real Tiger West while he was averaging 53 @ freundperPage Directed . He held a teamems ( through holster function occasionally at referral to the OTCE ) gatherings before moving to the 2010 Wildcats All Big Ten Championships .
+Response 2:  ,.Physics was a halfback in All @-@ Madden ,temperaturenieSTA grandfather , for a closed @-@ out Argoples and was a committed junior .
+ Over the course of the season , Princeton failed to qualify for either a second consecutive tournament . The 2011 set offerv Griffin 's 46
