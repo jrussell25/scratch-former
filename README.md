@@ -232,11 +232,11 @@ The module is organized into a few submodules:
 
 **Scripts**
 
-- [`train.py`](./scratch_former/scripts/train.py) - train the basic model configuration on
+- [`train.py`](./scripts/train.py) - train the basic model configuration on
   the wikitext2 dataset.
-- [`validate.py`](./scratch_former/scripts/validate.py) - Iterates through saved model benchmarks and computes sliding-window
+- [`validate.py`](./scripts/validate.py) - Iterates through saved model benchmarks and computes sliding-window
   perplexity for the validation set.
-- [`generate.py`](./scratch_former/scripts/generate.py) - Test the different sampling
+- [`generate.py`](./scripts/generate.py) - Test the different sampling
   strategies.
 
 
