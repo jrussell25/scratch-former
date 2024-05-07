@@ -3,7 +3,7 @@
 Getting my hands dirty building a language model from scratch.
 
 Intall with ` pip install -e .`
-See [Usage](#usage) for how the libary works a description of the [scripts]()
+See [Usage](#usage) for how the libary works a description of the [scripts](./scripts/)
 that I use for training, inference, and other miscellaneous tasks.
 
 ## Introduction
