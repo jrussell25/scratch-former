@@ -15,7 +15,7 @@ out to address those gaps.
 
 One major issue to address up front is what it means to make something "from scratch,"
 after all as Carl Sagan says, "If you wish to make an apple pie from scratch, you must
-first invent the universe" and something similar is definitely true for transformer
+first invent the universe" and something similar is true for transformer
 models.
 
 This implementation uses only what I consider to be core elements of pytorch to create
@@ -46,42 +46,146 @@ text from huggingface.
 
 #### Results
 
-After training, this model achieves a sliding-window perplexity PPL of 35.XX (CHECK!).
-This is comparable to quoted values for models like `gpt2-small` which has about 50%
-more paramters than my model and was of course trained on more data with more compute.
+After training, this model achieves a sliding-window perplexity PPL of 34.423 on the
+validation segment of the `wikitext2` dataset.
+This is comparable to quoted values for models like
+[`gpt2-small`](https://huggingface.co/openai-community/gpt2#evaluation-results) which achieves a perplexity of 29.41 on `wikitext2`. has about 10M more parameters than what I implement here and was of course trained on more data with more compute.
 
-(MAKE A PLOT)
+<img src="./content/training_val.png" alt="validation loss" width="600px"/>
 
 
 ### Inference Strategies
 
-I got particularly interested in the inference process for this and similar models. I
-started where most do with greedy search: predicting un-normalized logits for the next
-token in the sequence and then selecting the highest probability token.
+I got particularly interested in the inference process for these autoregressive models
+and implemented four different stratgies to see how they worked.
+As I am writing this, the Boston Celtics are in the NBA playoffs and General Manager Brad Stevens happened to be in the `wikitext2` test segment so the examples below all try to continue his wikipedia page (more samples can be found [here](./content/run2.txt1).
+Here are the first 256 tokens that seeds each of the
+examples below:
 
-** Greedy Samples **
 
-** Beam Search Samples **
+>  = Brad Stevens =
 
-The beam search results are somewhat interesting because you can see where the model
-knows patterns but not facts. For example it often knows that a sentence needs to refer
-to a year but has no idea what year things happen in.
+>  Bradley Kent " Brad " Stevens ( born October 22 , 1976 ) is an American professional basketball head coach for the Boston Celtics of the NBA . He was previously the head coach at Butler University in Indianapolis . A former basketball player , he grew up in Zionsville , Indiana , where he starred on the Zionsville Community High School basketball team , setting four school records . After high school , he attended DePauw University , where he played basketball and earned a degree in economics . He made the all @-@ conference team multiple times and was a three @-@ time Academic All @-@ America nominee .
 
-Another interesting phenomenon was the way these models get caught in "loops," highly
-repetitive sequences. It turns out this is a well documented phenomenon. Apparently pure
-sampling approaches help with repetition though tend to devolve quickly into nonsense.
-I'm most interested to try *nucleus sampling* where one computes the logits, keep only
-the top ~95%, and randomly sample from those.
+>  Stevens joined the Butler basketball program as a volunteer prior to the 2000 – 01 season after quitting his job at Eli Lilly and Company . He was promoted to a full @-@ time assistant coaching position for the 2001 – 02 season . On April 4 , 2007 , he became the head coach after Todd Lickliter left to coach the Iowa Hawkeyes . In his first year , Stevens led Butler to 30 wins , becoming the third @-@ youngest head coach in NCAA Division I history to have a 30 @-@ win season .
+
+>  In 2010
+
+**Greedy Samples**
+
+I started where most do with greedy search: selecting the highest probability token as
+the next token repeatedly.
+
+>  , he was named to the All @-@ Star Team , where he was named to the All @-@ Star Team.
+
+>  = = Early life = =
+
+>  Stevens was born on April 28 , 1987 in the village of St. Louis , Missouri , to a young boy , and his wife ,
+
+**Beam Search**
+
+Beam search was often mentioned as a relatively easy improvement over greedy search:
+instead of taking only the highest probability next token one tracks some fixed number
+of most likely outputs updating the total log-probablity of the sequence as its
+generated. The following was generated with a beam width of 10.
+
+> Response:  and 2012 , he was named the 2012 NCAA Men 's Basketball Tournament Most Valuable Player of the Year .
+
+>  = = Early career = =
+
+>  = = = Early years ( 2012 – 13 ) = = =
+
+>  Stevens attended the University of Michigan in 2012 , where he
+
+In both the greedy and beam search cases its nice to see that model has learned how
+wikipedia formatting works (with nested `=`s being used to format the headings).
+They also manage to stay roughly on topic (discussing college basketball) and then
+going into more detail about his life in (something like) chronological order.
+Unsurprisingly they don't reproduce any accurate facts about Brad Stevens.
+
+**Top-k Sampling**
+
+Another interesting phenomenon was the way these models get caught in "loops," highly repetitive sequences.
+The most common sampling stratgey is top-k sampling, where we keep only the k most
+likely next tokens and sample randomly from that subset. Here is a sample with `k=128`:
+
+
+> , Bradley was a Class 15A NBA All @-@ American select All @-@ Pro selection — the Young Player , and the Johnson brothers of the Class @-@ Gator Cup . He was the # 6 pick and 9th overall defensive selection .
+
+>  = = = College career = = =
+
+This is definitely more "surprising" to read but has a much harder time staying on the
+topic.
+As a quick follow up I also implemented temperature sampling: scaling the logits with a
+"temperature" (referring of course to how temerature (kT) scales energies in the boltzmann distribution).
+Low temperature sampling has the effect of boosting the probabilities of the more likely
+next tokens and is widely used to improve sample quality. An example with `T=0.7`:
+
+> , Stevens was named the starting quarterback and co @-@ captains for the 2008 – 09 season , making 12 appearances in the 2009 – 10 season . The team won the 2009 National Invitation Tournament with 14 wins .
+
+>  = = Professional career = =
+
+
+**Nucleus Sampling**
+
+A final approach I explored was nucleus sampling
+When I looked into the repetitive sequence issue, I found that it was a [well documented phenomenon](https://arxiv.org/abs/1904.09751).
+The linked paper proposes nucleus sampling as a way to maintain the randomness of top-k
+sampling while also dynamically adjusting for cases where there is more or less
+uncertainty in the next token.
+For each prediction, instead of sampling from the top k possible tokens, we sample from
+the set of most probable tokens that cumulatively represent `p_nuc` of the total
+probability mass.
+This stratgey removes the need to set a fixed k value and includes more potential
+tokens when there is more uncertainty and fewer tokens when there is less uncertainty.
+This sample was generated with the authors suggested `p_nuc=0.95`:
+
+
+> , he appeared at M @-@ 0 in the NCAA Division I Basketball Tournament in Bangkok , where he graduated from the high school .
+
+> On September 5 , ída impecc Jack Brui , after his playing season against the Bob under @-@ /{{ leaked'Connor Amounts they married the teenager\_RAD of
+
+These samples were a little disappointing but its probably just due to the fact that my
+model has not seen enough data to have high enough certainty about what the next token
+should be.
+I hypothesize that these samples are made worse by using a large (\~ 100k tokens)
+BPE vocabulary so there are still a lot of low probability tokens below the 95% threshold.
 
 ### Other things I learned along the way
 
-- BPE Tokenization -- a very clever solution and a major cut corner. When I was first
-  learning about language modeling (ca 2017) word embeddings like GLoVE were still
+**BPE Tokenization** BPE is a very clever solution that I did not appreciate at all before
+starting this project. It was also the largest corner that I cut in this implementation.
+When I was first learning about language modeling (ca 2017) word embeddings like GloVe were still
 quite popular and that was actually where I started for this model.
-- Cloud computing -- I was surprised by how tricky it was to get high-end GPUs (e.g. V100 let lone A100) on AWS. In retrospect it is pretty reasonable to prevent new users to get on these expensive GPUs when Amazon doesnt trust them to pay. I ended up using paperspace.
-- Value of better GPUs -- I did some very preliminary tests of training throughput on
-  different hardware. It my tests it was worth paying up for better machines in the
-sense of reducing the cost per training iteration.
+Compared to GloVe, however, byte-level BPE reduces vocab size by about 3x and it
+doesnt have to deal with any unknown tokens because all computerized text is represented in bytes.
+I though about training a BPE but I was very enamored with
+[`tiktoken`](https://github.com/openai/tiktoken) which besides
+being written in rust (so fast and multithreaded) also has an incredible
+[`educational`](https://github.com/openai/tiktoken/blob/main/tiktoken/_educational.py)
+submodule that has a pedagical python implementation of byte-level BPE which is
+everything I could have ever hoped to make. All that said, one thing I would change if
+starting this over would be to use a tokenizer with a smaller vocabulary (there seems
+to be some consensus emerging in the open-sourve LM world about using the llama2
+tokenizer which has a vocab of approximately 32k tokens). A smaller vocab (especially
+with weight tying between the embedding and output layer) would clear up a decent chunk
+of memory that could be used for a bigger model).
+
+**Cloud computing** I was surprised by how tricky it was to get high-end GPUs
+(e.g. V/A/H100) on AWS.
+In retrospect it is pretty reasonable to prevent new users to get on these
+expensive GPUs when Amazon doesnt trust them to pay. I submitted one or two requests
+to get access but didn't succeed I guess they want to see a track record of payments.
+I ended up using paperspace where it was easy to get a lower level (RTX-4000) GPU.
+It ended up costing about $20 to train this model which includes a solid chunk of
+running the instance and debugging the ancient CUDA drivers it came with as well as
+a few bucks for durable storage.
+One closely related learning was that it seems to be worth paying for better
+GPUs. The sticker shock of a couple $ per hour always gets me but in some very limited
+tests with low-end hardware, I was able to achieve about a 5x speedup in training
+iterations per second for about a 2x increase in cost/hour. I suspect this calculus
+does not generalize very easily depending on the model size, GPU memory, and GPU
+memory bandwidth but it certainly worth trying to figure out on a per-project basis.
 
 ### Interesting follow ups
 
